@@ -23,37 +23,51 @@ connectBtn.addEventListener('click', () => {
     peer = new Peer();
 
     peer.on('open', (id) => {
-        // Attempt connection to the board (which uses the code as its ID)
-        conn = peer.connect(code);
-
-        conn.on('open', () => {
-            // Send identity
-            conn.send({ type: 'join', name: name });
-
-            setupScreen.classList.add('hidden');
-            buzzerScreen.classList.remove('hidden');
-            document.getElementById('display-name').innerText = name.toUpperCase();
-        });
-
-        conn.on('data', (data) => {
-            if (data.type === 'lock') {
-                buzzerBtn.classList.add('locked');
-                feedbackMsg.innerText = "SIGNAL JAMMED";
-            } else if (data.type === 'unlock') {
-                buzzerBtn.classList.remove('locked');
-                feedbackMsg.innerText = "READY FOR ENGAGEMENT";
-            }
-        });
-
-        conn.on('close', () => {
-            location.reload();
-        });
+        console.log("Remote Peer ID:", id);
+        attemptConnection(code, name);
     });
 
     peer.on('error', (err) => {
+        console.error("Peer Error:", err);
         statusMsg.innerText = "SIGNAL LOST: " + err.type;
+        if (err.type === 'peer-unavailable') {
+            statusMsg.innerText = "BOARD NOT FOUND. CHECK CODE: " + code;
+        }
     });
 });
+
+function attemptConnection(code, name) {
+    conn = peer.connect(code, {
+        reliable: true
+    });
+
+    conn.on('open', () => {
+        conn.send({ type: 'join', name: name });
+        setupScreen.classList.add('hidden');
+        buzzerScreen.classList.remove('hidden');
+        document.getElementById('display-name').innerText = name.toUpperCase();
+    });
+
+    conn.on('data', (data) => {
+        if (data.type === 'lock') {
+            buzzerBtn.classList.add('locked');
+            feedbackMsg.innerText = "SIGNAL JAMMED";
+        } else if (data.type === 'unlock') {
+            buzzerBtn.classList.remove('locked');
+            feedbackMsg.innerText = "READY FOR ENGAGEMENT";
+        }
+    });
+
+    conn.on('close', () => {
+        statusMsg.innerText = "CONNECTION TERMINATED";
+        location.reload();
+    });
+
+    conn.on('error', (err) => {
+        console.error("Link Error:", err);
+        statusMsg.innerText = "LINK FAILED: " + err.type;
+    });
+}
 
 buzzerBtn.addEventListener('mousedown', sendBuzz);
 buzzerBtn.addEventListener('touchstart', (e) => {
