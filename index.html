@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>COMMANDER REMOTE | HOIpardy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <div id="setup-screen" class="panel">
+        <h1>COMMANDER REMOTE</h1>
+        <div class="input-group">
+            <label>JOIN CODE</label>
+            <input type="text" id="join-code" placeholder="e.g. WAR-77" autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label>CALLSIGN</label>
+            <input type="text" id="player-name" placeholder="YOUR NAME" autocomplete="off">
+        </div>
+        <button id="connect-btn">INITIALIZE CONNECTION</button>
+        <p id="status-msg">STANDBY...</p>
+    </div>
+
+    <div id="buzzer-screen" class="panel hidden">
+        <div id="remote-header">
+            <span id="display-name">COMMANDER</span>
+            <span id="conn-status" class="online">ONLINE</span>
+        </div>
+        <button id="buzzer-btn">
+            <div class="btn-inner">BUZZ</div>
+        </button>
+        <p id="feedback-msg">READY FOR ENGAGEMENT</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
