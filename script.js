@@ -55,6 +55,16 @@ function attemptConnection(code, name) {
         } else if (data.type === 'unlock') {
             buzzerBtn.classList.remove('locked');
             feedbackMsg.innerText = "READY FOR ENGAGEMENT";
+        } else if (data.type === 'play-audio') {
+            feedbackMsg.innerText = "INCOMING AUDIO RELAY...";
+            setTimeout(() => {
+                const audio = new Audio(data.url);
+                audio.play();
+                feedbackMsg.innerText = "PLAYING AUDIO...";
+                audio.onended = () => {
+                    feedbackMsg.innerText = "AUDIO RELAY COMPLETE";
+                };
+            }, data.delay || 0);
         }
     });
 
