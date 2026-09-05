@@ -20,19 +20,7 @@ connectBtn.addEventListener('click', () => {
     statusMsg.innerText = "INITIALIZING SIGNAL...";
 
     peer = new Peer({
-        debug: 2,
-        config: {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:global.stun.twilio.com:3478' },
-                // TURN relay: required for phones on mobile data / restrictive NAT,
-                // otherwise the WebRTC connection fails with "negotiation-failed".
-                // Public test relay - swap for your own coturn in production.
-                { urls: 'turn:openrelay.metered.ca:80', username: 'openrelayproject', credential: 'openrelayproject' },
-                { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-                { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-            ]
-        }
+        debug: 2
     });
 
     peer.on('open', (id) => {
