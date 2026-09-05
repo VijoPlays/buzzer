@@ -1,6 +1,8 @@
 let peer = null;
 let conn = null;
 
+const ICE_URL = 'https://vijoplays.metered.live/api/v1/turn/credentials?apiKey=ec5256551db13ce7fb65fe5acf9706b7a01f';
+
 const setupScreen = document.getElementById('setup-screen');
 const buzzerScreen = document.getElementById('buzzer-screen');
 const connectBtn = document.getElementById('connect-btn');
@@ -8,7 +10,7 @@ const buzzerBtn = document.getElementById('buzzer-btn');
 const statusMsg = document.getElementById('status-msg');
 const feedbackMsg = document.getElementById('feedback-msg');
 
-connectBtn.addEventListener('click', () => {
+connectBtn.addEventListener('click', async () => {
     const code = document.getElementById('join-code').value.trim().toUpperCase();
     const name = document.getElementById('player-name').value.trim();
 
@@ -19,14 +21,19 @@ connectBtn.addEventListener('click', () => {
 
     statusMsg.innerText = "INITIALIZING SIGNAL...";
 
+    let iceServers;
+    try {
+        const data = await fetch(ICE_URL).then(r => r.json());
+        iceServers = Array.isArray(data) ? data : (data.iceServers || []);
+    } catch (e) {
+        statusMsg.innerText = "SIGNAL ERROR: COULD NOT REACH RELAY SERVICE";
+        return;
+    }
+
     peer = new Peer({
         debug: 2,
         config: {
-            iceServers: [
-                { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
-                { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
-                { urls: 'turns:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
-            ],
+            iceServers,
             iceTransportPolicy: 'relay'
         }
     });
@@ -46,9 +53,15 @@ connectBtn.addEventListener('click', () => {
 });
 
 function attemptConnection(code, name) {
+    statusMsg.innerText = "CONNECTING TO BOARD...";
     conn = peer.connect(code, { reliable: true });
 
+    const connectTimeout = setTimeout(() => {
+        if (!conn || !conn.open) statusMsg.innerText = "CONNECTION TIMED OUT - CHECK THE CODE AND TRY AGAIN";
+    }, 20000);
+
     conn.on('open', () => {
+        clearTimeout(connectTimeout);
         conn.send({ type: 'join', name: name });
         setupScreen.classList.add('hidden');
         buzzerScreen.classList.remove('hidden');
@@ -81,6 +94,7 @@ function attemptConnection(code, name) {
     });
 
     conn.on('error', (err) => {
+        clearTimeout(connectTimeout);
         console.error("Link Error:", err);
         statusMsg.innerText = "LINK FAILED: " + err.type;
     });
