@@ -19,9 +19,24 @@ connectBtn.addEventListener('click', () => {
 
     statusMsg.innerText = "INITIALIZING SIGNAL...";
 
-    peer = new Peer({
-        debug: 2
-    });
+    const config = {
+        iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            {
+                urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            },
+            {
+                urls: 'turns:openrelay.metered.ca:443?transport=tcp',
+                username: 'openrelayproject',
+                credential: 'openrelayproject'
+            }
+        ]
+    };
+
+    peer = new Peer({ config });
 
     peer.on('open', (id) => {
         console.log("Remote Peer ID:", id);
@@ -38,7 +53,9 @@ connectBtn.addEventListener('click', () => {
 });
 
 function attemptConnection(code, name) {
-    conn = peer.connect(code, { reliable: true });
+    conn = peer.connect(code, {
+        reliable: true
+    });
 
     conn.on('open', () => {
         conn.send({ type: 'join', name: name });
