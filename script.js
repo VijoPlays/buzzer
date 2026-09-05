@@ -20,7 +20,15 @@ connectBtn.addEventListener('click', () => {
     statusMsg.innerText = "INITIALIZING SIGNAL...";
 
     peer = new Peer({
-        debug: 2
+        debug: 2,
+        config: {
+            iceServers: [
+                { urls: 'turn:openrelay.metered.ca:443', username: 'openrelayproject', credential: 'openrelayproject' },
+                { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' },
+                { urls: 'turns:openrelay.metered.ca:443?transport=tcp', username: 'openrelayproject', credential: 'openrelayproject' }
+            ],
+            iceTransportPolicy: 'relay'
+        }
     });
 
     peer.on('open', (id) => {
