@@ -19,8 +19,15 @@ connectBtn.addEventListener('click', () => {
 
     statusMsg.innerText = "INITIALIZING SIGNAL...";
 
-    // Create random ID for remote
-    peer = new Peer();
+    peer = new Peer({
+        debug: 2,
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:global.stun.twilio.com:3478' }
+            ]
+        }
+    });
 
     peer.on('open', (id) => {
         console.log("Remote Peer ID:", id);
@@ -37,9 +44,7 @@ connectBtn.addEventListener('click', () => {
 });
 
 function attemptConnection(code, name) {
-    conn = peer.connect(code, {
-        reliable: true
-    });
+    conn = peer.connect(code);
 
     conn.on('open', () => {
         conn.send({ type: 'join', name: name });
