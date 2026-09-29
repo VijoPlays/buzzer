@@ -10,6 +10,32 @@ const buzzerBtn = document.getElementById('buzzer-btn');
 const statusMsg = document.getElementById('status-msg');
 const feedbackMsg = document.getElementById('feedback-msg');
 
+const THEME_KEY = 'buzzer-theme';
+let text = {};
+
+// The board sends its theme on join; the last one is cached so the setup screen matches next time.
+function applyTheme(theme) {
+    if (!theme) return;
+    const root = document.documentElement;
+    Object.entries(theme.colors || {}).forEach(([name, value]) => root.style.setProperty(`--${name}`, value));
+    if (theme.fonts) {
+        root.style.setProperty('--font-body', theme.fonts.body);
+        root.style.setProperty('--font-heading', theme.fonts.heading);
+    }
+    root.dataset.theme = theme.id || '';
+    text = theme.text || {};
+    document.querySelectorAll('[data-text]').forEach(el => {
+        if (text[el.dataset.text]) el.textContent = text[el.dataset.text];
+    });
+    document.querySelectorAll('[data-placeholder]').forEach(el => {
+        if (text[el.dataset.placeholder]) el.placeholder = text[el.dataset.placeholder];
+    });
+}
+
+const say = (key, fallback) => text[key] || fallback;
+
+try { applyTheme(JSON.parse(localStorage.getItem(THEME_KEY))); } catch (e) {}
+
 connectBtn.addEventListener('click', async () => {
     const code = document.getElementById('join-code').value.trim().toUpperCase();
     const name = document.getElementById('player-name').value.trim();
@@ -69,12 +95,15 @@ function attemptConnection(code, name) {
     });
 
     conn.on('data', (data) => {
-        if (data.type === 'lock') {
+        if (data.type === 'theme') {
+            applyTheme(data.theme);
+            try { localStorage.setItem(THEME_KEY, JSON.stringify(data.theme)); } catch (e) {}
+        } else if (data.type === 'lock') {
             buzzerBtn.classList.add('locked');
-            feedbackMsg.innerText = "SIGNAL JAMMED";
+            feedbackMsg.innerText = say('locked', "SIGNAL JAMMED");
         } else if (data.type === 'unlock') {
             buzzerBtn.classList.remove('locked');
-            feedbackMsg.innerText = "READY FOR ENGAGEMENT";
+            feedbackMsg.innerText = say('ready', "READY FOR ENGAGEMENT");
         } else if (data.type === 'play-audio') {
             feedbackMsg.innerText = "INCOMING AUDIO RELAY...";
             setTimeout(() => {
@@ -109,7 +138,7 @@ buzzerBtn.addEventListener('touchstart', (e) => {
 function sendBuzz() {
     if (conn && conn.open && !buzzerBtn.classList.contains('locked')) {
         conn.send({ type: 'buzz', timestamp: Date.now() });
-        feedbackMsg.innerText = "ENGAGED";
+        feedbackMsg.innerText = say('buzzed', "ENGAGED");
         buzzerBtn.classList.add('locked'); // Auto-lock locally to prevent spam
     }
 }
