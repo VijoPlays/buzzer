@@ -1,9 +1,9 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #050505;
-    color: #9db67d;
-    font-family: 'Courier New', Courier, monospace;
+    background-color: var(--bg, #050505);
+    color: var(--text, #9db67d);
+    font-family: var(--font-body, 'Courier New', Courier, monospace);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -15,18 +15,19 @@ body {
 .panel {
     width: 90%;
     max-width: 400px;
-    background-color: #1a1a1a;
-    border: 2px solid #556b2f;
+    background-color: var(--surface-2, #1a1a1a);
+    border: 2px solid var(--primary, #556b2f);
     padding: 30px;
     text-align: center;
-    box-shadow: 0 0 30px rgba(85, 107, 47, 0.2);
+    box-shadow: 0 0 30px color-mix(in srgb, var(--primary, #556b2f) 20%, transparent);
 }
 
 h1 {
     font-size: 1.5rem;
     letter-spacing: 4px;
     margin-bottom: 30px;
-    border-bottom: 1px solid #556b2f;
+    border-bottom: 1px solid var(--primary, #556b2f);
+    font-family: var(--font-heading, inherit);
     padding-bottom: 10px;
 }
 
@@ -40,14 +41,14 @@ label {
     font-size: 0.7rem;
     letter-spacing: 2px;
     margin-bottom: 5px;
-    color: #556b2f;
+    color: var(--primary, #556b2f);
 }
 
 input {
     width: 100%;
-    background: #0b0b0b;
-    border: 1px solid #556b2f;
-    color: #ffd700;
+    background: var(--surface, #0b0b0b);
+    border: 1px solid var(--primary, #556b2f);
+    color: var(--accent, #ffd700);
     padding: 12px;
     font-family: inherit;
     font-size: 1rem;
@@ -58,8 +59,8 @@ input {
 button#connect-btn {
     width: 100%;
     background: transparent;
-    border: 2px solid #556b2f;
-    color: #556b2f;
+    border: 2px solid var(--primary, #556b2f);
+    color: var(--primary, #556b2f);
     padding: 15px;
     font-family: inherit;
     font-weight: bold;
@@ -68,14 +69,14 @@ button#connect-btn {
 }
 
 button#connect-btn:active {
-    background: #556b2f;
-    color: #0b0b0b;
+    background: var(--primary, #556b2f);
+    color: var(--on-primary, #0b0b0b);
 }
 
 #status-msg {
     font-size: 0.7rem;
     margin-top: 15px;
-    color: #666;
+    color: var(--text-dim, #666);
 }
 
 .hidden { display: none; }
@@ -89,20 +90,20 @@ button#connect-btn:active {
     margin-bottom: 40px;
 }
 
-#conn-status.online { color: #2e8b57; }
+#conn-status.online { color: var(--success, #2e8b57); }
 
 #buzzer-btn {
     width: 250px;
     height: 250px;
     border-radius: 50%;
-    background: #111;
-    border: 8px solid #8b0000;
-    color: #8b0000;
+    background: var(--surface, #111);
+    border: 8px solid var(--danger, #8b0000);
+    color: var(--danger, #8b0000);
     font-family: inherit;
     font-size: 2.5rem;
     font-weight: 900;
     cursor: pointer;
-    box-shadow: 0 10px 0 #500, 0 15px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 0 color-mix(in srgb, var(--danger, #8b0000) 60%, #000), 0 15px 30px rgba(0,0,0,0.5);
     transition: all 0.1s;
     outline: none;
     -webkit-tap-highlight-color: transparent;
@@ -110,10 +111,10 @@ button#connect-btn:active {
 
 #buzzer-btn:active {
     transform: translateY(8px);
-    box-shadow: 0 2px 0 #500, 0 5px 10px rgba(0,0,0,0.5);
-    background: #2a0000;
-    color: #ff4444;
-    border-color: #ff4444;
+    box-shadow: 0 2px 0 color-mix(in srgb, var(--danger, #8b0000) 60%, #000), 0 5px 10px rgba(0,0,0,0.5);
+    background: color-mix(in srgb, var(--danger, #8b0000) 25%, var(--surface, #111));
+    color: var(--danger-bright, #ff4444);
+    border-color: var(--danger-bright, #ff4444);
 }
 
 #buzzer-btn.locked {
