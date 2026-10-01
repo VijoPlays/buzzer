@@ -9,6 +9,7 @@ const connectBtn = document.getElementById('connect-btn');
 const buzzerBtn = document.getElementById('buzzer-btn');
 const statusMsg = document.getElementById('status-msg');
 const feedbackMsg = document.getElementById('feedback-msg');
+const lateMsg = document.getElementById('late-msg');
 
 const THEME_KEY = 'buzzer-theme';
 let text = {};
@@ -104,6 +105,11 @@ function attemptConnection(code, name) {
         } else if (data.type === 'unlock') {
             buzzerBtn.classList.remove('locked');
             feedbackMsg.innerText = say('ready', "READY FOR ENGAGEMENT");
+            lateMsg.classList.add('hidden');
+        } else if (data.type === 'late') {
+            const seconds = (Math.ceil(data.deltaMs) / 1000).toFixed(3);
+            lateMsg.innerText = `Congratulations! You buzzed in ${seconds} seconds too late.`;
+            lateMsg.classList.remove('hidden');
         } else if (data.type === 'play-audio') {
             feedbackMsg.innerText = "INCOMING AUDIO RELAY...";
             setTimeout(() => {
